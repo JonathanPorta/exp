@@ -20,10 +20,16 @@ export default (program: any) => {
       'Number of logs to view, maximum 100, default 5.',
       parseInt
     )
-    .option('-p, --platform [ios|android]', 'Filter by platform, android or ios.')
+    .option(
+      '-p, --platform [ios|android]',
+      'Filter by platform, android or ios.'
+    )
     .allowNonInteractive()
     .asyncActionProjectDir(async (projectDir, options) => {
-      if (options.count && (isNaN(options.count) || options.count < 1 || options.count > 100)) {
+      if (
+        options.count &&
+        (isNaN(options.count) || options.count < 1 || options.count > 100)
+      ) {
         log.error('-n must be a number between 1 and 100 inclusive');
         process.exit(1);
       }
@@ -31,9 +37,9 @@ export default (program: any) => {
       let formData = new FormData();
       formData.append('queryType', 'history');
       formData.append('slug', await Project.getSlugAsync(projectDir, options));
-      if (options.releaseChannel) {
-        formData.append('releaseChannel', options.releaseChannel);
-      }
+      // if (options.releaseChannel) {
+      //   formData.append('releaseChannel', options.releaseChannel);
+      // }
       if (options.count) {
         formData.append('count', options.count);
       }
@@ -41,9 +47,15 @@ export default (program: any) => {
         formData.append('platform', options.platform);
       }
 
-      let result = await Api.callMethodAsync('publishInfo', null, 'post', null, {
-        formData,
-      });
+      let result = await Api.callMethodAsync(
+        'publishInfo',
+        null,
+        'post',
+        null,
+        {
+          formData
+        }
+      );
 
       if (result.queryResult && result.queryResult.length > 0) {
         // Print general publication info
@@ -51,17 +63,23 @@ export default (program: any) => {
         let generalTableString = table.printTableJson(
           {
             fullName: sampleItem.fullName,
-            ...(sampleItem.channel ? { channel: sampleItem.channel } : null),
+            ...(sampleItem.channel ? { channel: sampleItem.channel } : null)
           },
           'General Info'
         );
         console.log(generalTableString);
 
         // Print info specific to each publication
-        let headers = ['publicationId', 'appVersion', 'sdkVersion', 'publishedTime', 'platform'];
-        if (options.releaseChannel) {
-          headers.push('channelId');
-        }
+        let headers = [
+          'publicationId',
+          'appVersion',
+          'sdkVersion',
+          'publishedTime',
+          'platform'
+        ];
+        // if (options.releaseChannel) {
+        //   headers.push('channelId');
+        // }
 
         // colWidths contains the cell size of each header
         let colWidths = [];
@@ -71,7 +89,11 @@ export default (program: any) => {
             ? colWidths.push(HORIZ_CELL_WIDTH_BIG)
             : colWidths.push(HORIZ_CELL_WIDTH_SMALL);
         });
-        let tableString = table.printTableJsonArray(headers, result.queryResult, colWidths);
+        let tableString = table.printTableJsonArray(
+          headers,
+          result.queryResult,
+          colWidths
+        );
         console.log(tableString);
       } else {
         log.error('No records found matching your query.');
@@ -94,9 +116,15 @@ export default (program: any) => {
       formData.append('publishId', options.publishId);
       formData.append('slug', await Project.getSlugAsync(projectDir, options));
 
-      let result = await Api.callMethodAsync('publishInfo', null, 'post', null, {
-        formData,
-      });
+      let result = await Api.callMethodAsync(
+        'publishInfo',
+        null,
+        'post',
+        null,
+        {
+          formData
+        }
+      );
 
       if (result.queryResult) {
         let queryResult = result.queryResult;
@@ -104,11 +132,17 @@ export default (program: any) => {
         delete queryResult.manifest;
 
         // Print general release info
-        let generalTableString = table.printTableJson(queryResult, 'Release Description');
+        let generalTableString = table.printTableJson(
+          queryResult,
+          'Release Description'
+        );
         console.log(generalTableString);
 
         // Print manifest info
-        let manifestTableString = table.printTableJson(manifest, 'Manifest Details');
+        let manifestTableString = table.printTableJson(
+          manifest,
+          'Manifest Details'
+        );
         console.log(manifestTableString);
       } else {
         log.error('No records found matching your query.');

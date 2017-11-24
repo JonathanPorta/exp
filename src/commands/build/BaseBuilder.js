@@ -13,14 +13,14 @@ type BuilderOptions = {
   wait: boolean,
   clearCredentials: boolean,
   type?: string,
-  releaseChannel?: string,
+  releaseChannel?: string
 };
 
 export default class BaseBuilder {
   projectDir: string = '';
   options: BuilderOptions = {
     wait: false,
-    clearCredentials: false,
+    clearCredentials: false
   };
   run: () => Promise<void>;
 
@@ -59,7 +59,7 @@ export default class BaseBuilder {
 
     const buildStatus = await Project.buildAsync(this.projectDir, {
       mode: 'status',
-      current,
+      current
     });
 
     if (buildStatus.err) {
@@ -132,7 +132,9 @@ ${buildStatus.id}
         }
       });
 
-      throw new BuildError('Cannot start new build, as there is a build in progress.');
+      throw new BuildError(
+        'Cannot start new build, as there is a build in progress.'
+      );
     }
 
     log('No currently active or previous builds for this project.');
@@ -144,13 +146,17 @@ ${buildStatus.id}
 
     //run publish -- in future, we should determine whether we NEED to do this
     const { ids: expIds, url, err } = await publishAction(this.projectDir, {
-      releaseChannel: this.options.releaseChannel,
+      // releaseChannel: this.options.releaseChannel
     });
 
     if (err) {
-      throw new BuildError(`No url was returned from publish. Please try again.\n${err}`);
+      throw new BuildError(
+        `No url was returned from publish. Please try again.\n${err}`
+      );
     } else if (!url || url === '') {
-      throw new BuildError('No url was returned from publish. Please try again.');
+      throw new BuildError(
+        'No url was returned from publish. Please try again.'
+      );
     }
 
     return expIds;
@@ -162,14 +168,14 @@ ${buildStatus.id}
     let opts = {
       mode: 'create',
       expIds,
-      platform,
-      releaseChannel: this.options.releaseChannel,
+      platform
+      // releaseChannel: this.options.releaseChannel,
     };
 
     if (platform === 'ios') {
       opts = {
         ...opts,
-        type: this.options.type,
+        type: this.options.type
       };
     }
 
@@ -183,7 +189,9 @@ ${buildStatus.id}
       if (buildErr) {
         throw new BuildError(`Build failed with error.\n${buildErr}`);
       } else if (!ipaUrl || ipaUrl === '' || !apkUrl || apkUrl === '') {
-        throw new BuildError('No url was returned from the build process. Please try again.');
+        throw new BuildError(
+          'No url was returned from the build process. Please try again.'
+        );
       }
 
       log(`IPA Url: ${ipaUrl}`);
